@@ -17,6 +17,11 @@ namespace Dapper
     /// </summary>
     public partial class DynamicParameters : SqlMapper.IDynamicParameters, SqlMapper.IParameterLookup, SqlMapper.IParameterCallbacks
     {
+        /// <summary>
+        /// Default type for parameters with null values and unassigned types
+        /// </summary>
+        public static DbType? DefultParameterType = null;
+
         internal const DbType EnumerableMultiParameter = (DbType)(-1);
         private static readonly Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> paramReaderCache = new Dictionary<SqlMapper.Identity, Action<IDbCommand, object>>();
         private readonly Dictionary<string, ParamInfo> parameters = new Dictionary<string, ParamInfo>();
@@ -232,11 +237,18 @@ namespace Dapper
                 var isCustomQueryParameter = val is SqlMapper.ICustomQueryParameter;
 
                 SqlMapper.ITypeHandler handler = null;
-                if (dbType == null && val != null && !isCustomQueryParameter)
+                if (dbType == null && !isCustomQueryParameter)
                 {
+                    if (val != null)
+                    {
 #pragma warning disable 618
-                    dbType = SqlMapper.LookupDbType(val.GetType(), name, true, out handler);
+                        dbType = SqlMapper.LookupDbType(val.GetType(), name, true, out handler);
 #pragma warning disable 618
+                    }
+                    else if (DefultParameterType != null)
+                    {
+                        dbType = DefultParameterType.Value;
+                    }
                 }
                 if (isCustomQueryParameter)
                 {
