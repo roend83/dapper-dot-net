@@ -20,7 +20,7 @@ namespace Dapper
         /// <summary>
         /// Default type for parameters with null values and unassigned types
         /// </summary>
-        public static DbType? DefultParameterType = null;
+        public static DbType? DefaultParameterType = null;
 
         internal const DbType EnumerableMultiParameter = (DbType)(-1);
         private static readonly Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> paramReaderCache = new Dictionary<SqlMapper.Identity, Action<IDbCommand, object>>();
@@ -245,9 +245,9 @@ namespace Dapper
                         dbType = SqlMapper.LookupDbType(val.GetType(), name, true, out handler);
 #pragma warning disable 618
                     }
-                    else if (DefultParameterType != null)
+                    else if (DefaultParameterType != null)
                     {
-                        dbType = DefultParameterType.Value;
+                        dbType = DefaultParameterType.Value;
                     }
                 }
                 if (isCustomQueryParameter)
